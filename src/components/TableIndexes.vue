@@ -1,0 +1,73 @@
+<template>
+    <table class="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th scope="col" class="px-3 py-3">
+                    Escala
+                </th>
+                <th v-if="showWNV" scope="col" class="px-3 py-3">
+                    Suma escalar
+                </th>
+                <th scope="col" class="px-3 py-3">
+                    Puntuación compuesta
+                </th>
+                <th scope="col" class="px-3 py-3">
+                    Percentil
+                </th>
+                <th scope="col" class="px-2 py-3 text-center">
+                    Intervalo de confianza
+                    <label class="inline-flex items-center cursor-pointer gap-2">
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-300">90%</span>
+                        <input @change="changeRange($event.target.checked)"
+                            type="checkbox" value="" class="sr-only peer">
+                        <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-black after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600"></div>
+                        <span class="text-sm font-medium text-gray-900 dark:text-gray-300">95%</span>
+                    </label>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="(item, index) in indexes" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" class="px-3 py-2 font-medium text-gray-900 dark:text-white whitespace-pre-wrap">
+                    {{ item.name }}
+                </th>
+                <td v-if="showWNV" class="px-3 py-2 text-center">
+                    {{ composes.Sum }}
+                </td>
+                <td class="px-3 py-2 text-center">
+                    {{ composes[item.code][item.code] }}
+                </td>
+                <td class="px-3 py-2 text-center">
+                    {{ composes[item.code].Percentil }}
+                </td>
+                <td class="px-3 py-2 text-center">
+                    <p v-if="!range">{{ composes[item.code]['90%'] }}</p>
+                    <p v-else>{{ composes[item.code]['95%'] }}</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+
+const props = defineProps({
+    indexes: {
+        required: true, type: Array
+    },
+    composes: {
+        required: true, type: Object
+    },
+    showWNV: {
+        default: false, type: Boolean
+    }
+})
+const range = ref(false);
+const emit = defineEmits(['updateGraphics']);
+
+function changeRange(value) {
+    range.value = value;
+    emit('updateGraphics', value);
+}
+</script>
