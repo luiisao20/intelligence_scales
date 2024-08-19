@@ -12,28 +12,7 @@
     </div>
     <div class="flex flex-col gap-10 w-full items-center">
         <div class="">
-            <table class="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        <th scope="col" class="px-6 py-3">
-                            Escala
-                        </th>
-                        <th scope="col" class="px-6 py-3">
-                            Suma escalar
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="indexer in indexes" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                            {{ indexer.name }}
-                        </th>
-                        <td class="px-6 py-4 text-center">
-                            {{ indexesSum[indexer.code] }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <IndexesSum :indexes="indexes" :indexes-sum="indexesSum"/>
         </div>
         <div v-if="showComposes" class="flex flex-col items-center gap-5">
             <TableIndexes :indexes="indexes" :composes="composes" @update-graphics="changeRange" />
@@ -53,6 +32,7 @@ import { ref } from 'vue';
 import TableTests from '@/components/TableTests.vue';
 import { findScalars } from '@/composables/getRange'
 import TableIndexes from '@/components/TableIndexes.vue';
+import IndexesSum from '@/components/IndexesSum.vue';
 
 const inputTests = ref({});
 const table = ref({});
@@ -105,11 +85,7 @@ function checkRestrictions() {
     for (let i = 0; i < Object.keys(testsCounting.value).length; i++) {
         const element = Object.keys(testsCounting.value)[i];
 
-        if (testsCounting.value[element] !== indexes.find(value => value.group === element).nums) {
-            console.log('new error');
-
-            return true
-        }
+        if (testsCounting.value[element] !== indexes.find(value => value.group === element).nums) return true
     }
 
     if (errors.threeMainsEmpty > 2) return true;
@@ -145,7 +121,6 @@ function changeRange(value) {
         const compose = composes.value[key.code];
         setLimits(compose);
     })
-    console.log(composes.value);
 }
 
 function setLimits(compose) {

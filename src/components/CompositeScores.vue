@@ -11,7 +11,7 @@
                 <p v-else>95%</p>
             </div>
         </div>
-        <div id="data-labels-chart"></div>
+        <div :id="`data-labels-chart-${graphicsId}`"></div>
     </div>
 </template>
 
@@ -31,6 +31,9 @@ const props = defineProps({
     },
     title: {
         default: 'Perfil de puntuaciones compuestas', type: String
+    },
+    graphicsId: {
+        default: 'one', type: String
     }
 })
 const chart = ref(null);
@@ -114,25 +117,30 @@ onBeforeMount(() => {
 
 watchEffect(() => {
     if(chart.value) {
-        chart.value.updateSeries([
-            {
-                data: props.dataGraphics.upperLimits,
-            },
-            {
-                data: props.dataGraphics.lowerLimits,
-            },
-            {
-                data: props.dataGraphics.values,
-            },
-        ])
+        chart.value.updateOptions({
+            series: [
+                {
+                    data: props.dataGraphics.upperLimits,
+                },
+                {
+                    data: props.dataGraphics.lowerLimits,
+                },
+                {
+                    data: props.dataGraphics.values,
+                }
+            ],
+            xaxis: {
+                categories: props.dataGraphics.xlabel,
+            }
+        })
     }
 })
 
 onMounted(() => {
     initFlowbite();
 
-    if (document.getElementById("data-labels-chart") && typeof ApexCharts !== 'undefined') {
-        chart.value = new ApexCharts(document.getElementById("data-labels-chart"), options.value);
+    if (document.getElementById(`data-labels-chart-${props.graphicsId}`) && typeof ApexCharts !== 'undefined') {
+        chart.value = new ApexCharts(document.getElementById(`data-labels-chart-${props.graphicsId}`), options.value);
         chart.value.render();
     }
 })

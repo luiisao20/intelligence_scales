@@ -1,12 +1,13 @@
 <template>
-    <TableTests
+<section>
+        <TableTests
         :tests="tests"
         :indexes="index"
         :multiple-groups="false"
         :inputs="inputTests"
         :points="scalarPoints"
         :age-restriction="true"
-        :restrictions="restrictions['5-0 7-11']"
+        :restrictions="restrictions['8-0 21-11']"
         @show-points="findScalarScoring"
     />
     <div v-if="showComposes" class="flex flex-col items-center">
@@ -28,6 +29,7 @@
             />
         </div>
     </div>
+</section>
 </template>
 
 <script setup>

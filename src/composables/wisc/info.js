@@ -2,89 +2,92 @@ const tests = [
     {
         code: 'C',
         name: 'Cubos',
-        primaryGroup: 'Visoespacial',
-        secondaryGroup: ['No verbal', 'Capacidad general']
+        primary: ['Visoespacial'],
+        secondary: ['No verbal', 'Capacidad general']
     },
     {
         code: 'S',
         name: 'Semejanzas',
-        primaryGroup: 'Comprensión verbal',
-        secondaryGroup: ['Capacidad general']
+        primary: ['Comprensión verbal'],
+        secondary: ['Capacidad general']
     },
     {
         code: 'M',
         name: 'Matrices',
-        primaryGroup: 'Razonamiento fluido',
-        secondaryGroup: ['Capacidad general', 'No verbal']
+        primary: ['Razonamiento fluido'],
+        secondary: ['No verbal', 'Capacidad general']
     },
     {
         code: 'D',
         name: 'Dígitos',
-        primaryGroup: 'Memoria de trabajo',
-        secondaryGroup: ['Memoria de trabajo auditiva', 'Competencia cognitiva']
+        primary: ['Memoria de trabajo'],
+        secondary: ['Memoria de trabajo auditiva', 'Competencia cognitiva']
     },
     {
         code: 'CL',
         name: 'Claves',
-        primaryGroup: 'Velocidad de procesamiento',
-        secondaryGroup: ['No verbal', 'Competencia cognitiva']
+        primary: ['Velocidad de procesamiento'],
+        secondary: ['No verbal', 'Competencia cognitiva']
     },
     {
         code: 'V',
         name: 'Vocabulario',
-        primaryGroup: 'Comprensión verbal',
-        secondaryGroup: ['Capacidad general']
+        primary: ['Comprensión verbal'],
+        secondary: ['Capacidad general']
     },
     {
         code: 'B',
         name: 'Balanzas',
-        primaryGroup: 'Razonamiento fluido',
-        secondaryGroup: ['Razonamiento cuantitativo', 'No verbal', 'Capacidad general']
+        primary: ['Razonamiento fluido'],
+        secondary: ['Razonamiento cuantitativo', 'No verbal', 'Capacidad general']
     },
     {
         code: 'PV',
         name: 'Puzles visuales',
-        primaryGroup: 'Visoespacial',
-        secondaryGroup: ['No verbal']
+        primary: ['Visoespacial'],
+        secondary: ['No verbal']
     },
     {
         code: 'SD',
         name: 'Span de dibujos',
-        primaryGroup: 'Memoria de trabajo',
-        secondaryGroup: ['No verbal', 'Competencia cognitiva']
+        primary: ['Memoria de trabajo'],
+        secondary: ['No verbal', 'Competencia cognitiva']
     },
     {
         code: 'BS',
         name: 'Búsqueda de símbolos',
-        primaryGroup: 'Velocidad de procesamiento',
-        secondaryGroup: ['Competencia cognitiva']
+        primary: ['Velocidad de procesamiento'],
+        secondary: ['Competencia cognitiva']
     },
     {
         code: 'I',
         name: 'Información',
-        primaryGroup: 'Comprensión verbal',
+        primary: [],
+        secondary: [],
     },
     {
         code: 'LN',
         name: 'Letras y números',
-        primaryGroup: 'Memoria de trabajo',
-        secondaryGroup: ['Memoria de trabajo auditiva']
+        primary: [],
+        secondary: ['Memoria de trabajo auditiva']
     },
     {
         code: 'CA',
         name: 'Cancelación',
-        primaryGroup: 'Velocidad de procesamiento',
+        primary: [],
+        secondary: [],
     },
     {
         code: 'CO',
         name: 'Comprensión',
-        primaryGroup: 'Comprensión verbal',
+        primary: [],
+        secondary: [],
     },
     {
         code: 'A',
         name: 'Aritmética',
-        primaryGroup: 'Razonamiento fluido',
-        secondaryGroup: ['Razonamiento cuantitativo']
+        primary: [],
+        secondary: ['Razonamiento cuantitativo']
     },
 ]
 
@@ -103,7 +106,6 @@ const primaryIndexes = [
         code: 'IRF',
         name: 'Índice de razonamiento fluido',
         group: 'Razonamiento fluido',
-        restriction: true
     },
     {
         code: 'IMT',
@@ -114,16 +116,17 @@ const primaryIndexes = [
         code: 'IVP',
         name: 'Índice de velocidad de procesamiento',
         group: 'Velocidad de procesamiento',
-        restriction: true
     },
     {
         code: 'CIT',
         name: 'Coeficiente intelectual total',
+        mains: ['C', 'S', 'M', 'D', 'CL', 'V', 'B'],
+        optionals: ['PV', 'SD', 'BS', 'I', 'LN', 'CA', 'CO', 'A'],
         group: null
     }
 ]
 
-const secondryIndexes = [
+const secondaryIndexes = [
     {
         code: 'IRC',
         name: 'Índice de razonamiento cuantitativo',
@@ -150,3 +153,5 @@ const secondryIndexes = [
         group: 'Competencia cognitiva',
     }
 ]
+
+export{ tests, primaryIndexes, secondaryIndexes };

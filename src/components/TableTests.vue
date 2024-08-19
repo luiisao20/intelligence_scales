@@ -2,19 +2,24 @@
     <table class=" relative text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mx-auto">
         <thead class="text-xs sticky top-0 text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <th scope="col" class="px-6 py-3 text-center">
+                <th scope="col" rowspan="2" class="px-6 py-3 text-center">
                     Prueba
                 </th>
-                <th scope="col" class="px-6 py-3 text-center">
+                <th scope="col" rowspan="2" class="px-6 py-3 text-center">
                     PD
                 </th>
-                <th scope="col" colspan="5" class="px-6 py-3">
-                    <div class="flex items-center justify-between gap-10">
+                <th scope="col" :colspan="indexes.length" class="px-6 py-1">
+                    <div class="flex items-center justify-center gap-10">
                         Puntuación escalar
                         <button @click="$emit('showPoints')" class="bg-black text-white px-2 py-2 rounded-xl hover:bg-white hover:text-black">
                             Go
                         </button>
                     </div>
+                </th>
+            </tr>
+            <tr>
+                <th v-for="indexer in indexes" scope="col" class="px-6 py-1 text-center">
+                    <p v-if="!indexer.restriction">{{ indexer.code }}</p>
                 </th>
             </tr>
         </thead>
@@ -31,15 +36,15 @@
                         type="text" :id="`test-${test.code}`" 
                         class="w-full text-center border-0 border-b border-blue-300">
                 </td>
-                <td v-if="multipleGroups" v-for="item in indexes" class="px-1 text-white">
-                    <div v-if="item.code !== 'CIT'" class="bg-slate-500 rounded-lg p-3 text-center w-12 h-12">
+                <td v-if="multipleGroups" v-for="item in indexes" class="text-white">
+                    <div v-if="item.code !== 'CIT'" class="bg-slate-500 rounded-lg p-3 text-center w-12 h-12 mx-auto">
                         <p v-if="test.group === item.group">{{ points[test.code] }}</p>
                     </div>
-                    <div v-else class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12">
+                    <div v-else class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12 mx-auto">
                         {{ points[test.code] }}
                     </div>
                 </td>
-                <td v-else class="px-1 text-white flex justify-center">
+                <td v-else class="text-white flex justify-center">
                     <div class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12">
                         {{ points[test.code] }}
                     </div>
@@ -59,11 +64,11 @@
                         type="text" :id="`test-${test.code}`" 
                         class="w-full text-center border-0 border-b border-blue-300">
                 </td>
-                <td v-if="multipleGroups" v-for="item in indexes" class="px-1 text-white">
-                    <div v-if="item.code !== 'CIT'" class="bg-slate-500 rounded-lg p-3 text-center w-12 h-12">
+                <td v-if="multipleGroups" v-for="item in indexes" class="text-white">
+                    <div v-if="item.code !== 'CIT' && !item.restriction" class="bg-slate-500 rounded-lg p-3 text-center w-12 h-12 mx-auto">
                         <p v-if="test.group === item.group">{{ points[test.code] }}</p>
                     </div>
-                    <div v-else class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12">
+                    <div v-else class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12 mx-auto">
                         {{ points[test.code] }}
                     </div>
                 </td>

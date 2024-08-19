@@ -1,6 +1,6 @@
 <template>
-    <table class="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <table class="relative text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead class="text-xs sticky top-0 text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th scope="col" class="px-3 py-3">
                     Escala
@@ -26,8 +26,8 @@
                 </th>
             </tr>
         </thead>
-        <tbody>
-            <tr v-for="(item, index) in indexes" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <tbody v-for="(item, index) in indexes">
+            <tr v-if="!restrictions.includes(item.code) && composes[item.code]" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                 <th scope="row" class="px-3 py-2 font-medium text-gray-900 dark:text-white whitespace-pre-wrap">
                     {{ item.name }}
                 </th>
@@ -61,6 +61,12 @@ const props = defineProps({
     },
     showWNV: {
         default: false, type: Boolean
+    },
+    state: {
+        default: false, type: Boolean
+    },
+    restrictions: {
+        default: [], type: Array
     }
 })
 const range = ref(false);
@@ -68,6 +74,6 @@ const emit = defineEmits(['updateGraphics']);
 
 function changeRange(value) {
     range.value = value;
-    emit('updateGraphics', value);
+    emit('updateGraphics', value, props.state);
 }
 </script>

@@ -2,94 +2,100 @@ const tests = [
     {
         code: 'C',
         name: 'Cubos',
-        primaryEarly: 'Visoespacial',
-        secondaryEarly: 'No verbal'
+        primary: ['Visoespacial'],
+        secondary: ['No verbal', 'Capacidad general'],
     },
     {
         code: 'I',
         name: 'Información',
-        primaryEarly: 'Comprensión verbal',
-        secondaryEarly: 'Capacidad general'
+        primary: ['Comprensión verbal'],
+        secondary: ['Capacidad general'],
     },
     {
         code: 'M',
         name: 'Matrices',
-        primaryLast: 'Razonamiento fluido',
-        secondaryLast: 'No verbal'
+        primary: ['Razonamiento fluido'],
+        secondary: ['No verbal', 'Capacidad general'],
+        restriction: true,
     },
     {
         code: 'BA',
         name: 'Búsqueda de animales',
-        primaryLast: 'Velocidad de procesamiento',
-        secondaryLast: 'Competencia cognitiva'
+        primary: ['Velocidad de procesamiento'],
+        secondary: ['No verbal', 'Competencia cognitiva'],
+        restriction: true,
     },
     {
         code: 'R',
         name: 'Reconocimiento',
-        primaryEarly: 'Memoria de trabajo',
-        secondaryEarly: 'No verbal'
+        primary: ['Memoria de trabajo'],
+        secondary: ['No verbal', 'Competencia cognitiva'],
     },
     {
         code: 'S',
         name: 'Semejanzas',
-        primaryLast: 'Comprensión verbal',
-        secondaryLast: 'Capacidad general'
+        primary: ['Comprensión verbal'],
+        secondary: ['Capacidad general'],
+        restriction: true,
     },
     {
         code: 'CON',
         name: 'Conceptos',
-        primaryLast: 'Razonamiento fluido',
-        secondaryLast: 'Capacidad general'
+        primary: ['Razonamiento fluido'],
+        secondary: ['No verbal', 'Capacidad general'],
+        restriction: true,
     },
     {
         code: 'CA',
         name: 'Cancelación',
-        primaryLast: 'Velocidad de procesamiento',
-        secondaryLast: 'Competencia cognitiva'
+        restriction: true,
+        primary: ['Velocidad de procesamiento'],
+        secondary: ['No verbal', 'Competencia cognitiva'],
     },
     {
         code: 'L',
         name: 'Localización',
-        primaryEarly: 'Memoria de trabajo',
-        secondaryEarly: 'No verbal',
-        secondaryLast: 'Competencia cognitiva'
+        primary: ['Memoria de trabajo'],
+        secondary: ['No verbal', 'Competencia cognitiva'],
     },
     {
         code: 'RO',
         name: 'Rompecabezas',
-        primaryEarly: 'Visoespacial',
-        secondaryEarly: 'Capacidad general'
+        primary: ['Visoespacial'],
+        secondary: ['No verbal', 'Capacidad general'],
     },
     {
         code: 'V',
         name: 'Vocabulario',
-        primaryLast: 'Comprensión verbal',
-        secondaryLast: 'Capacidad general'
+        restriction: true,
+        primary: [],
+        secondary: ['Capacidad general'],
     },
     {
         code: 'CF',
         name: 'Clave de figuras',
-        primaryLast: 'Velocidad de procesamiento',
-        secondaryLast: 'Competencia cognitiva'
+        restriction: true,
+        primary: [],
+        secondary: ['No verbal', 'Competencia cognitiva'],
     },
     {
         code: 'CO',
         name: 'Comprensión',
-        primaryLast: 'Comprensión verbal',
-        secondaryLast: 'Capacidad general'
+        restriction: true,
+        primary: [],
+        secondary: ['Capacidad general'],
     },
     {
         code: 'D',
         name: 'Dibujos',
-        primaryEarly: 'Comprensión verbal',
-        secondaryEarly: 'Capacidad general',
-        secondaryLast: 'Adquisición de vocabulario'
+        primary: ['Comprensión verbal'],
+        secondary: ['Adquisición de vocabulario', 'Capacidad general'],
     },
     {
         code: 'N',
         name: 'Nombres',
-        primaryEarly: 'Comprensión verbal',
-        secondaryEarly: 'Adquisición de vocabulario'
+        primary: [],
+        secondary: ['Adquisición de vocabulario', 'Capacidad general'],
     },
 ]
 
@@ -124,7 +130,11 @@ const primaryIndexes = [
     {
         code: 'CIT',
         name: 'Coeficiente intelectual total',
-        group: null
+        group: null,
+        earlyOptionals: ['N', 'L'],
+        earlyMains: ['D', 'C', 'R', 'I', 'RO'],
+        lastMains: ['C', 'I', 'M', 'BA', 'R', 'S'],
+        lastOptionals: ['CON', 'CA', 'L', 'RO', 'V', 'CF', 'CO'],
     }
 ]
 
@@ -132,22 +142,36 @@ const secondaryIndexes = [
     {
         code: 'IAV',
         name: 'Índice de adquisición de vocabulario',
+        earlyMains: ['D', 'N'],
+        earlyOptionals: [],
+        lastOptionals: [],
         group: 'Adquisición de vocabulario'
     },
     {
         code: 'INV',
         name: 'Índice no verbal',
-        group: 'No verbal'
+        group: 'No verbal',
+        earlyMains: ['C', 'R', 'RO', 'L'],
+        earlyOptionals: [],
+        lastMains: ['C', 'M', 'BA', 'R', 'CON'],
+        lastOptionals: ['CA', 'L', 'RO', 'CF']
     },
     {
         code: 'ICG',
         name: 'Índice de capacidad general',
-        group: 'Capacidad general'
+        group: 'Capacidad general',
+        earlyMains: ['D', 'C', 'I', 'RO'],
+        earlyOptionals: ['N'],
+        lastMains: ['C', 'I', 'M', 'S'],
+        lastOptionals: ['CON', 'RO', 'V', 'CO']
     },
     {
         code: 'ICC',
         name: 'Índice de competencia cognitiva',
         group: 'Competencia cognitiva',
+        earlyOptionals: [],
+        lastMains: ['BA', 'R', 'CA', 'L'],
+        lastOptionals: ['CF'],
         restriction: true,
     },
 ]

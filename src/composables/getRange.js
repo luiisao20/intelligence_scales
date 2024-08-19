@@ -25,7 +25,7 @@ function getRange(test, value) {
     }
 }
 
-function findScalars(inputTests, table, tests, indexes) {
+function findScalars(inputTests, table, tests, indexes, multipleIndexes) {
     let points = {};
     let sum = {};
     const errors = {
@@ -46,12 +46,20 @@ function findScalars(inputTests, table, tests, indexes) {
         else if (range === -1) errors.empty = true;
         else {
             points[test] = table.data[test][range];
+            let index = null
 
             const item = tests.find(value => test === value.code);
-            const index = indexes.find(value => item.group === value.group);
-            
-            if (indexes.length > 1) sum[index.code] += points[test];
-            sum[indexes[indexes.length - 1].code] += points[test];
+            if(multipleIndexes) {
+                item[multipleIndexes].forEach(indexer => {
+                    index = indexes.find(value => value.group === indexer);
+                    sum[index.code] += points[test];
+                })
+            }
+            else {
+                index = indexes.find(value => item.group === value.group);
+                if (indexes.length > 1) sum[index.code] += points[test];
+            }
+            if (multipleIndexes !== 'secondary') sum[indexes[indexes.length - 1].code] += points[test];
         }        
         return true
     });
