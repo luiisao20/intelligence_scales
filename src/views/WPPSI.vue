@@ -93,7 +93,6 @@ const age = {
 const chrAge = ref(0);
 const showComposes = ref(false);
 const testsCopy = ref([]);
-const indexesErrors = ref({});
 
 onBeforeMount(() => {
     chrAge.value = age.years + age.months / 12;
@@ -299,78 +298,6 @@ function findSecErrors() {
     }
 
 }
-
-// function selectReplacementsWPPSI(code, completed, uncompleted) {
-//     switch (code) {
-//         case 'INV':
-//             if (uncompleted.includes('C')) {
-//                 if (completed.includes('RO')) return secondaryData.points['RO'];
-//                 return false
-//             } else if (uncompleted.includes('R')) {
-//                 if (completed.includes('L')) return secondaryData.points['L'];
-//                 return false;
-//             } else if (uncompleted.includes('BA')) {
-//                 if (completed.includes('CA')) return secondaryData.points['CA'];
-//                 else if (completed.includes('CF')) return secondaryData.points['CF'];
-//                 return false
-//             } else if (uncompleted.includes('M') || uncompleted.includes('CON')) return false
-//             return 0;
-//         case 'ICG':
-//             if (uncompleted.includes('I') || uncompleted.includes('S')) {
-//                 if (completed.includes('V')) return secondaryData.points['V'];
-//                 else if (completed.includes('CO')) return secondaryData.points['CO'];
-//                 return false;
-//             } else if (uncompleted.includes('C')) {
-//                 if (completed.includes('RO')) return secondaryData.points['RO'];
-//                 return false
-//             } else if (uncompleted.includes('M')) {
-//                 if (completed.includes('CON')) return secondaryData.points['CON'];
-//                 return false
-//             }
-//             return 0;
-//         case 'ICC':
-//             if (uncompleted.includes('BA') || uncompleted.includes('CA')) {
-//                 if (completed.includes('CF')) return secondaryData.points['CF'];
-//                 return false
-//             } else if (uncompleted.includes('R') || uncompleted.includes('L')) return false
-//             return 0;
-//         case 'CIT': 
-//             if (uncompleted.includes('I') || uncompleted.includes('S')) {
-//                 if (completed.includes('V')) return primaryData.points['V'];
-//                 else if (completed.includes('CO')) return primaryData.points['CO'];
-//                 return false;
-//             } else if (uncompleted.includes('C')) {
-//                 if (completed.includes('RO')) return primaryData.points['RO'];
-//                 return false
-//             } else if (uncompleted.includes('M')) {
-//                 if (completed.includes('CON')) return primaryData.points['CON'];
-//                 return false
-//             } else if (uncompleted.includes('R')) {
-//                 if (completed.includes('L')) return primaryData.points['L'];
-//                 return false
-//             } else if (uncompleted.includes('BA')) {
-//                 if (completed.includes('CA')) return primaryData.points['CA'];
-//                 else if (completed.includes('CF')) return primaryData.points['CF'];
-//                 return false;
-//             }
-//             return 0;
-//         case 'CIT1': 
-//             if (uncompleted.includes('D')) {
-//                 if (completed.includes('N')) return primaryData.points['N'];
-//                 return false;
-//             } else if (uncompleted.includes('R')) {
-//                 if (completed.includes('L')) return primaryData.points['L'];
-//                 return false;
-//             } else if (uncompleted.includes('C') || uncompleted.includes('I') || uncompleted.includes('RO')) return false;
-//             return 0;
-//         case 'ICG1': 
-//             if (uncompleted.includes('D')) {
-//                 if (completed.includes('N')) return primaryData.points['N'];
-//                 return false
-//             } else if (uncompleted.includes('C') || uncompleted.includes('I') || uncompleted.includes('RO')) return false;
-//             return 0;
-//     }
-// }
 
 function findScalarScoring() {
     showComposes.value = false;

@@ -59,8 +59,11 @@
                         class="text-white flex justify-center"
                         :class="{ 'underline decoration-black underline-offset-2': item[`${restrictions.age}Optionals`].includes(test.code) }"
                     >
-                        <div class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12">
+                        <div v-if="restrictions.age !== ''" class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12">
                             <p v-if="!['D', 'N'].includes(test.code) || restrictions.age === 'early'">{{ primaryPoints[test.code] }}</p>
+                        </div>
+                        <div v-else class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12">
+                            <p>{{ primaryPoints[test.code] }}</p>
                         </div>
                     </td>
                 </td>
@@ -100,7 +103,11 @@ const props = defineProps({
         required: true, type: Object
     },
     restrictions: {
-        default: {}, type: Object
+        default: {
+            tests: [],
+            indexes: [],
+            age: ''
+        }, type: Object
     }
 })
 const emits = defineEmits(['showPoints']);

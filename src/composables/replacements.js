@@ -91,7 +91,7 @@ function selectReplacementsWISC(code, completed, uncompleted, points) {
                 if (completed.includes('A')) return points['A'];
                 return false;
             } else if (uncompleted.includes('D')) {
-                if (completed.includes('SD')) return points['SP'];
+                if (completed.includes('SD')) return points['SD'];
                 else if (completed.includes('LN')) return points['LN'];
                 return false;
             } else if (uncompleted.includes('CL')) {

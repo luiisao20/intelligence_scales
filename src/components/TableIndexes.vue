@@ -45,6 +45,24 @@
                     <p v-else>{{ composes[item.code]['95%'] }}</p>
                 </td>
             </tr>
+            <tr v-else-if="composes[item.code]" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" class="px-3 py-2 font-medium text-gray-900 dark:text-white whitespace-pre-wrap">
+                    {{ item.name }}
+                </th>
+                <td v-if="showWNV" class="px-3 py-2 text-center">
+                    {{ composes.Sum }}
+                </td>
+                <td class="px-3 py-2 text-center">
+                    {{ composes[item.code][item.code] }}
+                </td>
+                <td class="px-3 py-2 text-center">
+                    {{ composes[item.code].Percentil }}
+                </td>
+                <td class="px-3 py-2 text-center">
+                    <p v-if="!range">{{ composes[item.code]['90%'] }}</p>
+                    <p v-else>{{ composes[item.code]['95%'] }}</p>
+                </td>
+            </tr>
         </tbody>
     </table>
 </template>

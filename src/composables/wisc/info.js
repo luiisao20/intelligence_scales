@@ -121,7 +121,7 @@ const primaryIndexes = [
         code: 'CIT',
         name: 'Coeficiente intelectual total',
         mains: ['C', 'S', 'M', 'D', 'CL', 'V', 'B'],
-        optionals: ['PV', 'SD', 'BS', 'I', 'LN', 'CA', 'CO', 'A'],
+        Optionals: ['PV', 'SD', 'BS', 'I', 'LN', 'CA', 'CO', 'A'],
         group: null
     }
 ]
@@ -130,27 +130,32 @@ const secondaryIndexes = [
     {
         code: 'IRC',
         name: 'Índice de razonamiento cuantitativo',
-        group: 'Razonamiento cuantitativo'
+        group: 'Razonamiento cuantitativo',
+        Optionals: [],
     },
     {
         code: 'IMTA',
         name: 'Índice de memoria de trabajo auditiva',
-        group: 'Memoria de trabajo auditiva'
+        group: 'Memoria de trabajo auditiva',
+        Optionals: [],
     },
     {
         code: 'INV',
         name: 'Índice no verbal',
-        group: 'No verbal'
+        group: 'No verbal',
+        Optionals: [],
     },
     {
         code: 'ICG',
         name: 'Índice de capacidad general',
-        group: 'Capacidad general'
+        group: 'Capacidad general',
+        Optionals: [],
     },
     {
         code: 'ICC',
         name: 'Índice de competencia cognitiva',
         group: 'Competencia cognitiva',
+        Optionals: [],
     }
 ]
 
