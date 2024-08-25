@@ -1,81 +1,65 @@
 <template>
-    <table class=" relative text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mx-auto">
-        <thead class="text-xs sticky top-0 text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <table class=" relative text-sm text-left rtl:text-right text-text dark:text-gray-400 mx-auto">
+        <thead class="text-base z-10 bg-light-background sticky top-0 uppercase dark:bg-gray-700 dark:text-gray-400">
             <tr>
-                <th scope="col" rowspan="2" class="px-6 py-3 text-center">
-                    Prueba
-                </th>
-                <th scope="col" rowspan="2" class="px-6 py-3 text-center">
-                    PD
-                </th>
-                <th scope="col" :colspan="indexes.length" class="px-6 py-1">
+                <th scope="col" :colspan="indexes.length + 1" class="px-6 py-1">
                     <div class="flex items-center justify-center gap-10">
                         Puntuación escalar
-                        <button @click="$emit('showPoints')" class="bg-black text-white px-2 py-2 rounded-xl hover:bg-white hover:text-black">
-                            Go
+                        <button @click="$emit('showPoints')" class="bg-primary text-black font-normal px-2 py-2 rounded-xl hover:bg-white hover:text-black">
+                            Buscar puntuaciones
                         </button>
                     </div>
                 </th>
             </tr>
             <tr>
-                <th v-for="indexer in indexes" scope="col" class="px-6 py-1 text-center">
+                <th scope="col" rowspan="2" class="px-6 py-3 text-center">
+                    Prueba
+                </th>
+                <th v-for="indexer in indexes" scope="col" class="px-6 py-1 text-center bg-secondary border-l-2 border-r-2">
                     <p v-if="!indexer.restriction">{{ indexer.code }}</p>
                 </th>
             </tr>
         </thead>
-        <tbody v-if="!ageRestriction">
-            <tr v-for="(test, index) in tests" :key="index" class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    {{ test.name }}
-                </th>
-                <td class="py-2 w-[60px] mx-6"
-                    :class="{ 'bg-red-700': errors.includes(test.code) }"
-                >
-                    <input @input="checkValues($event.target.value, test.code)"
-                        v-model="inputs[test.code]" 
-                        type="text" :id="`test-${test.code}`" 
-                        class="w-full text-center border-0 border-b border-blue-300">
+        <tbody v-if="!wnv">
+            <tr v-for="(test, index) in tests" :key="index" class="odd:bg-white text-black odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <td class="py-1 px-6">
+                    <div class="relative z-0">
+                        <input v-model="inputs[test.code]" @input="checkValues($event.target.value, test.code)"
+                            type="text" :id="`test-${test.code}`" 
+                            class="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-transparent rounded-lg border-1 border-black appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-secondary peer" placeholder=" " />
+                        <label :for="`test-${test.code}`" class="absolute text-sm dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-secondary peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
+                            {{ test.name }}
+                        </label>
+                        <p v-if="errors.includes(test.code)" :id="`outlined_error_help_${test.code}`" class="mt-2 text-xs text-red-600 dark:text-red-400"><span class="font-medium">¡Oh!</span> Existe un error.</p>
+                    </div>
                 </td>
-                <td v-if="multipleGroups" v-for="item in indexes" class="text-white">
-                    <div v-if="item.code !== 'CIT'" class="bg-slate-500 rounded-lg p-3 text-center w-12 h-12 mx-auto">
+                <td v-for="item in indexes"
+                    class="text-center text-base bg-secondary border-2 text-text"
+                    :class="{ 'underline decoration-wavy': item.optionals.includes(test.code) }">
+                    <div v-if="item.code !== 'CIT'">
                         <p v-if="test.group === item.group">{{ points[test.code] }}</p>
                     </div>
-                    <div v-else class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12 mx-auto">
-                        {{ points[test.code] }}
-                    </div>
-                </td>
-                <td v-else class="text-white flex justify-center">
-                    <div class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12">
+                    <div v-else>
                         {{ points[test.code] }}
                     </div>
                 </td>
             </tr>
         </tbody>
-        <tbody v-else v-for="test in tests">
-            <tr v-if="restrictions.includes(test.code) || !test.restriction" class="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
-                <th scope="row" class="px-6 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                    {{ test.name }}
-                </th>
-                <td class="py-2 w-[60px] mx-6"
-                    :class="{ 'bg-red-700': errors.includes(test.code) }"
-                >
-                    <input @input="checkValues($event.target.value, test.code)"
-                        v-model="inputs[test.code]" 
-                        type="text" :id="`test-${test.code}`" 
-                        class="w-full text-center border-0 border-b border-blue-300">
-                </td>
-                <td v-if="multipleGroups" v-for="item in indexes" class="text-white">
-                    <div v-if="item.code !== 'CIT' && !item.restriction" class="bg-slate-500 rounded-lg p-3 text-center w-12 h-12 mx-auto">
-                        <p v-if="test.group === item.group">{{ points[test.code] }}</p>
-                    </div>
-                    <div v-else class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12 mx-auto">
-                        {{ points[test.code] }}
+        <tbody v-else>
+            <tr v-for="test in tests" class="odd:bg-white text-black odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
+                <td class="py-1 px-6">
+                    <div class="relative z-0">
+                        <input v-model="inputs[test.code]" @input="checkValues($event.target.value, test.code)"
+                            type="text" :id="`test-${test.code}`" 
+                            class="block px-2.5 pb-2.5 pt-4 w-full text-sm bg-transparent rounded-lg border-1 border-black appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-secondary peer" placeholder=" " />
+                        <label :for="`test-${test.code}`" class="absolute text-sm dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] dark:bg-gray-900 px-2 peer-focus:px-2 peer-focus:text-secondary peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:-translate-y-1/2 peer-placeholder-shown:top-1/2 peer-focus:top-2 peer-focus:scale-75 peer-focus:-translate-y-4 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto start-1">
+                            {{ test.name }}
+                        </label>
+                        <p v-if="errors.includes(test.code)" :id="`outlined_error_help_${test.code}`" class="mt-2 text-xs text-red-600 dark:text-red-400"><span class="font-medium">¡Oh!</span> Existe un error.</p>
                     </div>
                 </td>
-                <td v-else class="px-1 text-white flex justify-center">
-                    <div class="bg-slate-300 text-black rounded-lg p-3 text-center w-12 h-12">
-                        {{ points[test.code] }}
-                    </div>
+                <td class="text-center text-base bg-secondary border-2 text-text">
+                    {{ points[test.code] }}
                 </td>
             </tr>
         </tbody>
@@ -98,14 +82,8 @@ const props = defineProps({
     inputs: {
         required: true, type: Object
     },
-    multipleGroups: {
-        default: true, type: Boolean
-    },
-    ageRestriction: {
+    wnv: {
         default: false, type: Boolean
-    },
-    restrictions: {
-        default: [], type: Array
     }
 })
 const emits = defineEmits(['showPoints']);

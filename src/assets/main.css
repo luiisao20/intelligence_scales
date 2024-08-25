@@ -1,8 +1,31 @@
 @import './normalize.css';
+@import url('https://fonts.googleapis.com/css2?family=Dosis:wght@200..800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body{
+  background-color: var(--background-color);
   padding: 20px;
+  font-family: "Dosis", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+@media (min-width: 640px) {
+  .main-view {
+    margin-left: 276px;
+    margin-right: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+}
+
+:root{
+  --danger-color: #ED3B53;
+  --primary-color: #7ff5ca;
+  --background-color: #01130d;
+  --secondary-color: #0c8c9d;
+  --accent-color: #41c2f1;
+  --success-color: #3A865E;
 }

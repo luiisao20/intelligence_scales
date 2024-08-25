@@ -103,4 +103,50 @@ function selectReplacementsWISC(code, completed, uncompleted, points) {
     }
 }
 
-export { selectReplacementsWPPSI, selectReplacementsWISC }
+function selectReplacementsWAIS(code, completed, uncompleted, points) {
+    switch (code) {
+        case 'ICV':
+            if (uncompleted.includes('S') || uncompleted.includes('V') || uncompleted.includes('I')) {
+                if (completed.includes('CO')) return points['CO'];
+                return false;
+            }
+            return 0
+        case 'IRP':
+            if (uncompleted.includes('C') || uncompleted.includes('M') || uncompleted.includes('PV')) {
+                if (completed.includes('B')) return points['B'];
+                else if (completed.includes('FI')) return points['FI'];
+                return false
+            }
+            return 0
+        case 'IMT':
+            if (uncompleted.includes('D') || uncompleted.includes('A')) {
+                if (completed.includes('LN')) return points['LN'];
+                return false;
+            }
+            return 0
+        case 'IVP':
+            if (uncompleted.includes('BS') || uncompleted.includes('CN')) {
+                if (completed.includes('CA')) return points['CA'];
+                return false
+            }
+            return 0
+        case 'CIT': 
+            if (uncompleted.includes('S') || uncompleted.includes('V') || uncompleted.includes('I')) {
+                if (completed.includes('CO')) return points['CO'];
+                return false;
+            } else if (uncompleted.includes('C') || uncompleted.includes('M') || uncompleted.includes('PV')) {
+                if (completed.includes('B')) return points['B'];
+                else if (completed.includes('FI')) return points['FI'];
+                return false
+            } else if (uncompleted.includes('D') || uncompleted.includes('A')) {
+                if (completed.includes('LN')) return points['LN'];
+                return false;
+            } else if (uncompleted.includes('BS') || uncompleted.includes('CN')) {
+                if (completed.includes('CA')) return points['CA'];
+                return false
+            }
+            return 0
+    }
+}
+
+export { selectReplacementsWPPSI, selectReplacementsWISC, selectReplacementsWAIS }

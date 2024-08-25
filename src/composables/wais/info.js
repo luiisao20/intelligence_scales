@@ -2,61 +2,51 @@ const tests = [
     {
         code: 'C',
         name: 'Cubos',
-        main: true,
         group: 'Escala razonamiento perceptivo',
     },
     {
         code: 'S',
         name: 'Semejanzas',
-        main: true,
         group: 'Escala comprensión verbal',
     },
     {
         code: 'D',
         name: 'Dígitos',
-        main: true,
         group: 'Escala memoria de trabajo',
     },
     {
         code: 'M',
         name: 'Matrices',
-        main: true,
         group: 'Escala razonamiento perceptivo',
     },
     {
         code: 'V',
         name: 'Vocabulario',
-        main: true,
         group: 'Escala comprensión verbal',
     },
     {
         code: 'A',
         name: 'Aritmética',
-        main: true,
         group: 'Escala memoria de trabajo',
     },
     {
         code: 'BS',
         name: 'Búsqueda de símbolos',
-        main: true,
         group: 'Escala velocidad de procesamiento',
     },
     {
         code: 'PV',
         name: 'Puzles visuales',
-        main: true,
         group: 'Escala razonamiento perceptivo',
     },
     {
         code: 'I',
         name: 'Información',
-        main: true,
         group: 'Escala comprensión verbal',
     },
     {
         code: 'CN',
         name: 'Clave de números',
-        main: true,
         group: 'Escala velocidad de procesamiento',
     },
     {
@@ -64,7 +54,6 @@ const tests = [
         name: 'Letras y números',
         restriction: true,
         // No apto para mayores de 70 años
-        main: false,
         group: 'Escala memoria de trabajo',
     },
     {
@@ -72,13 +61,11 @@ const tests = [
         name: 'Balanzas',
         restriction: true,
         // No apto para mayores de 70 años
-        main: false,
         group: 'Escala razonamiento perceptivo',
     },
     {
         code: 'CO',
         name: 'Comprensión',
-        main: false,
         group: 'Escala comprensión verbal',
     },
     {
@@ -86,13 +73,11 @@ const tests = [
         name: 'Cancelación',
         restriction: true,
         // No apto para mayores de 70 años
-        main: false,
         group: 'Escala velocidad de procesamiento',
     },
     {
         code: 'FI',
         name: 'Figuras incompletas',
-        main: false,
         group: 'Escala razonamiento perceptivo',
     }
 ]
@@ -102,30 +87,36 @@ const indexes = [
         code: 'ICV',
         name: 'Índice de comprensión verbal',
         group: 'Escala comprensión verbal',
-        nums: 3
+        mains: ['S', 'V', 'I'],
+        optionals: ['CO']
     },
     {
         code: 'IRP',
         name: 'Índice de razonamiento perceptivo',
         group: 'Escala razonamiento perceptivo',
-        nums: 3
+        mains: ['C', 'M', 'PV'],
+        optionals: ['B', 'FI']
     },
     {
         code: 'IMT',
         name: 'Índice de memoria de trabajo',
         group: 'Escala memoria de trabajo',
-        nums: 2
+        mains: ['D', 'A'],
+        optionals: ['LN']
     },
     {
         code: 'IVP',
         name: 'Índice de velocidad de procesamiento',
         group: 'Escala velocidad de procesamiento',
-        nums: 2
+        mains: ['BS', 'CN'],
+        optionals: ['CA']
     },
     {
         code: 'CIT',
         name: 'Coeficiente intelectual total',
-        group: null
+        group: null,
+        mains: ['S', 'V', 'I', 'C', 'M', 'PV', 'D', 'A', 'BS', 'CN'],
+        optionals: ['CO', 'FI', 'LN', 'B', 'CA']
     }
 ]
 

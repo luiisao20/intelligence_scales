@@ -1,16 +1,13 @@
 <template>
-  <header>
-    <nav>
-      <RouterLink to="/">Go to Home</RouterLink>
-      <RouterLink to="/about">Go to About</RouterLink>
-    </nav>
-  </header>
-
+  <SideBar v-if="route.name !== 'Login'" />
   <main>
     <RouterView />
   </main>
 </template>
 
 <script setup>
+import SideBar from '@/components/SideBar.vue';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
 </script>

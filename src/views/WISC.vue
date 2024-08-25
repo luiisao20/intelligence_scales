@@ -1,5 +1,11 @@
 <template>
-    <section>
+    <div id="popup-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <Modal
+            v-bind="modalElements"
+            @close-modal="modal.hide()" 
+        />
+    </div>
+    <section class="main-view">
         <div>
             <TableInputs
                 :tests="testsCopy"
@@ -56,12 +62,15 @@ import a1 from '../../data/a1_wisc.json' with { type: 'json' };
 import a2_a7 from '../../data/a2_a7_wisc.json' with { type: 'json' };
 import c1_c5 from '../../data/c1_c5_wisc.json' with { type: 'json' };
 import TableInputs from '@/components/TableInputs.vue';
-import { onBeforeMount, reactive, ref } from 'vue';
+import { onBeforeMount, onMounted, reactive, ref } from 'vue';
 import IndexesSum from '@/components/IndexesSum.vue';
 import { findScalars } from '@/composables/getRange';
 import { selectReplacementsWISC } from '@/composables/replacements';
 import TableIndexes from '@/components/TableIndexes.vue';
 import CompositeScores from '@/components/CompositeScores.vue';
+import { initFlowbite, Modal as ModalFlow } from 'flowbite';
+import { useModal } from '@/composables/modal';
+import Modal from '@/components/Modal.vue';
 
 const testsCopy = ref([]);
 const primaryData = reactive({
@@ -80,6 +89,18 @@ const secondaryData = reactive({
 })
 const inputTests = ref({});
 const showComposes = ref(false);
+const modal = ref(null);
+const { modalElements, showModal } = useModal();
+
+onMounted(() => {
+    const target = document.getElementById('popup-modal');
+    const instanceOptions = {
+        id: 'popup-modal',
+        override: true
+    };
+    modal.value = new ModalFlow(target, instanceOptions);
+    initFlowbite();
+})
 
 onBeforeMount(() => {
     testsCopy.value = [ ...tests ];
@@ -88,6 +109,16 @@ onBeforeMount(() => {
 function findScalarScoring() {
     const primary = findScalars(inputTests.value, a1[0], testsCopy.value, primaryIndexes, 'primary');
     const secondary = findScalars(inputTests.value, a1[0], testsCopy.value, secondaryIndexes, 'secondary');
+
+    if (primary.errors.outOfRange !== '') {
+        const testError = testsCopy.value.find(test => test.code === primary.errors.outOfRange).name;
+        modal.value.show();
+        showModal(`La prueba ${testError} se encuentra fuera de rango`, false);
+    } else if (secondary.errors.outOfRange !== '') {
+        const testError = testsCopy.value.find(test => test.code === secondary.errors.outOfRange).name;
+        modal.value.show();
+        showModal(`La prueba ${testError} se encuentra fuera de rango`, false);
+    }
 
     primaryData.points = primary.points;
     primaryData.sum = primary.sum;
@@ -166,10 +197,10 @@ function findPrimarySums() {
     let uncompleted = [];
 
     testsCopy.value.forEach((test) => {
-        const element = inputTests.value[test.code];
+        const element = primaryData.points[test.code];
 
-        if(!element) uncompleted.push(test.code);
-        else completed.push(test.code);
+        if(!element) {uncompleted.push(test.code);}
+        else {completed.push(test.code);}
 
         if (test.primary.length > 0) {
             const pIndex = primaryIndexes.find(index => index.group === test.primary[0]).code;

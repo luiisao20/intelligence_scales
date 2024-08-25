@@ -1,6 +1,6 @@
 <template>
-    <table class="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+    <table class="text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 bg-light-background rounded-md">
+        <thead class="text-xs text-text uppercase dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th colspan="2" class="text-center text-base">{{ title }}</th>
             </tr>
@@ -13,9 +13,9 @@
                 </th>
             </tr>
         </thead>
-        <tbody v-for="indexer in indexes">
-            <tr v-if="!restrictions.includes(indexer.code)" class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+        <tbody v-for="indexer in indexes" class="odd:bg-secondary even:bg-secondary/70 text-text">
+            <tr v-if="!restrictions.includes(indexer.code)" class="dark:bg-gray-800 dark:border-gray-700">
+                <th scope="row" class="px-6 py-4 font-medium whitespace-normal dark:text-white">
                     {{ indexer.name }}
                 </th>
                 <td class="px-6 py-4 text-center">

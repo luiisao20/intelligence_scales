@@ -1,6 +1,11 @@
 <template>
-    Hola
-    <section>
+    <div id="popup-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <Modal
+            v-bind="modalElements"
+            @close-modal="modal.hide()" 
+        />
+    </div>
+    <section class="main-view">
         <div>
             <TableInputs
                 :tests="testsCopy"
@@ -60,11 +65,14 @@ import a1 from '../../data/a1_wppsi.json' with { type: 'json' };
 import a2_a11 from '../../data/a2_a11_wppsi.json' with { type: 'json' };
 import b_c from '../../data/b_c_wppsi.json' with { type: 'json' };
 import TableInputs from '@/components/TableInputs.vue';
-import { onBeforeMount, reactive, ref } from 'vue';
+import { onBeforeMount, onMounted, reactive, ref } from 'vue';
 import { findScalars } from '@/composables/getRange';
 import IndexesSum from '@/components/IndexesSum.vue';
 import TableIndexes from '@/components/TableIndexes.vue';
 import CompositeScores from '@/components/CompositeScores.vue';
+import { useModal } from '@/composables/modal';
+import { initFlowbite, Modal as ModalFlow } from 'flowbite';
+import Modal from '@/components/Modal.vue';
 
 const primaryData = reactive({
     points: {},
@@ -93,6 +101,18 @@ const age = {
 const chrAge = ref(0);
 const showComposes = ref(false);
 const testsCopy = ref([]);
+const modal = ref(null);
+const { modalElements, showModal } = useModal();
+
+onMounted(() => {
+    const target = document.getElementById('popup-modal');
+    const instanceOptions = {
+        id: 'popup-modal',
+        override: true
+    };
+    modal.value = new ModalFlow(target, instanceOptions);
+    initFlowbite();
+})
 
 onBeforeMount(() => {
     chrAge.value = age.years + age.months / 12;
@@ -127,7 +147,7 @@ function findPrimaryErrors() {
     // Elimina la sumatoria de escalares por cada test no llenado para todos los índices
     // excepto para el CIT, además recolecta los tests llenados y no llenados
     testsToEval.forEach((test) => {
-        const element = inputTests.value[test.code];
+        const element = primaryData.points[test.code];
         if (test.primary.length > 0) {
             const pIndex = primaryIndexes.find(index => index.group === test.primary[0]).code;
             if (!element) {
@@ -173,7 +193,7 @@ function findSecondaryErrors() {
     // Elimina sumatoria de escalares por cada test no llenado para todos los
     // índices excepto para el ICG, además recolecta los tests completados y los que no
     testsToEval.forEach((test) => {
-        const element = inputTests.value[test.code];
+        const element = primaryData.points[test.code];
 
         if (!element) uncompleted.push(test.code);
         else completed.push(test.code);
@@ -213,7 +233,7 @@ function findPrimErrors() {
     const testsToEval = testsCopy.value.filter(test => test.code !== 'N' && test.code !== 'D');
 
     testsToEval.forEach((test) => {
-        const element = inputTests.value[test.code];
+        const element = primaryData.points[test.code];
 
         if (!element) uncompleted.push(test.code);
         else {
@@ -261,7 +281,7 @@ function findSecErrors() {
     if (inputTests.value['D'] && inputTests.value['N']) secondaryData.sum['IAV'] = secondaryData.points['D'] + secondaryData.points['N'];
 
     testsCopy.value.forEach((test) => {
-        const element = inputTests.value[test.code];
+        const element = primaryData.points[test.code];
 
         if (!['D', 'N'].includes(test.code)) {
             test.secondary.forEach((group) => {
@@ -309,15 +329,21 @@ function findScalarScoring() {
     secondaryData.points = secondary.points;
     // secondaryData.sum = secondary.sum;
 
+    if (primary.errors.outOfRange !== '') {
+        const testError = testsCopy.value.find(test => test.code === primary.errors.outOfRange).name;
+        modal.value.show();
+        showModal(`La prueba ${testError} se encuentra fuera de rango`, false);
+    } else if (secondary.errors.outOfRange !== '') {
+        const testError = testsCopy.value.find(test => test.code === secondary.errors.outOfRange).name;
+        modal.value.show();
+        showModal(`La prueba ${testError} se encuentra fuera de rango`, false);
+    }
+
     if (chrAge.value >= 4) {
         findPrimErrors();
         findSecErrors();
     } else {
-        try {
-            findPrimaryErrors();
-        } catch (error) {
-            console.log(error);
-        }
+        findPrimaryErrors();
         findSecondaryErrors();
     }
 

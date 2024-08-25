@@ -30,7 +30,7 @@ function findScalars(inputTests, table, tests, indexes, multipleIndexes) {
     let sum = {};
     const errors = {
         empty: false,
-        outOfRange: false
+        outOfRange: ''
     };
 
     indexes.forEach(element => {
@@ -42,9 +42,11 @@ function findScalars(inputTests, table, tests, indexes, multipleIndexes) {
     Object.keys(inputTests).every(test => {
         const range = getRange(test, inputTests[test], table);
         
-        if (!range) errors.outOfRange = true;
+        if (!range) errors.outOfRange = test;
         else if (range === -1) errors.empty = true;
         else {
+            if (test === 'A') console.log(range);
+            
             points[test] = table.data[test][range];
             let index = null
 

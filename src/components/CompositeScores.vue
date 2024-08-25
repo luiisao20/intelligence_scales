@@ -50,6 +50,9 @@ onBeforeMount(() => {
         // enable and customize data labels using the following example, learn more from here: https://apexcharts.com/docs/datalabels/
         dataLabels: {
             enabled: true,
+            background: {
+                borderRadius: 2
+            }
         },
         grid: {
             show: true,
@@ -64,17 +67,17 @@ onBeforeMount(() => {
             {
                 name: "Límite superior",
                 data: props.dataGraphics.upperLimits,
-                color: "#1A56DBB3",
+                color: "#0C8C9D",
             },
             {
                 name: "Límite inferior",
                 data: props.dataGraphics.lowerLimits,
-                color: "#1A56DBB3",
+                color: "#0C8C9D",
             },
             {
                 name: "Puntuación compuesta",
                 data: props.dataGraphics.values,
-                color: "#7E3BF2",
+                color: "#7FF5CA",
             },
         ],
         chart: {
