@@ -12,28 +12,22 @@
         <ul class="space-y-2 font-medium text-text">
             <li>
                 <RouterLink to="/home" class="flex items-center p-2 opacity-35 hover:opacity-100 dark:hover:bg-gray-700 group">
-                    <font-awesome-icon :icon="['fas', 'user']" class="text-accent"/>
-                    <span class="ms-3">Home</span>
+                    <font-awesome-icon :icon="['fas', 'rectangle-list']" class="text-accent"/>
+                    <span class="ms-3">Inicio</span>
                 </RouterLink>
             </li>
             <li>
                 <RouterLink to="/wnv" class="flex items-center p-2 opacity-35 hover:opacity-100 dark:hover:bg-gray-700 group">
-                    <font-awesome-icon :icon="['fas', 'rectangle-list']" class="text-accent"/>
-                    <span class="ms-3">WNV</span>
+                    <font-awesome-icon :icon="['fas', 'user']" class="text-accent"/>
+                    <span class="ms-3">Perfil</span>
                 </RouterLink>
             </li>
             <li>
                 <RouterLink to="/wisc" class="flex items-center p-2 opacity-35 hover:opacity-100 dark:hover:bg-gray-700 group">
                     <font-awesome-icon :icon="['fas', 'right-from-bracket']" class="text-accent"/>
-                    <span class="ms-3">WISC</span>
+                    <span class="ms-3">Cerrar sesión</span>
                 </RouterLink>
             </li>
-            <li>
-                <RouterLink to="/wppsi" class="flex items-center p-2 opacity-35 hover:opacity-100 dark:hover:bg-gray-700 group">
-                    <span class="ms-3">WPPSI</span>
-                </RouterLink>
-            </li>
-
         </ul>
     </div>
 </aside>

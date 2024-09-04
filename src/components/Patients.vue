@@ -37,7 +37,7 @@
                     {{ patient.data().id }}
                 </td>
                 <td class="px-6 py-4">
-                    <a href="#" class="font-medium text-primary dark:text-blue-500 hover:underline">Edit</a>
+                    <a @click="router.push(`/${patient.id}`)" href="#" class="font-medium text-primary dark:text-blue-500 hover:underline">Edit</a>
                 </td>
             </tr>
         </tbody>
@@ -46,6 +46,8 @@
 </template>
 
 <script setup>
+import { router } from '@/routes';
+
 
 const props = defineProps({
     packs: {

@@ -5,7 +5,7 @@
             @close-modal="modal.hide()" 
         />
     </div>
-    <section class="main-view">
+    <section class="my-10">
         <div>
             <TableInputs
                 :tests="testsCopy"
@@ -53,14 +53,16 @@
                 :range="secondaryData.range" title="Análisis Secundario - Puntuaciones compuestas"
                 graphics-id="two" />
         </div>
+        <div v-if="showSend" class="text-end">
+            <button type="button" id="save_data" @click="saveEvaluation" :class="{ 'cursor-progress': loading }" class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-secondary rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+                Guardar datos
+            </button>
+        </div>
     </section>
 </template>
 
 <script setup>
 import { tests, primaryIndexes, secondaryIndexes } from '@/composables/wisc/info';
-import a1 from '../../data/a1_wisc.json' with { type: 'json' };
-import a2_a7 from '../../data/a2_a7_wisc.json' with { type: 'json' };
-import c1_c5 from '../../data/c1_c5_wisc.json' with { type: 'json' };
 import TableInputs from '@/components/TableInputs.vue';
 import { onBeforeMount, onMounted, reactive, ref } from 'vue';
 import IndexesSum from '@/components/IndexesSum.vue';
@@ -71,6 +73,9 @@ import CompositeScores from '@/components/CompositeScores.vue';
 import { initFlowbite, Modal as ModalFlow } from 'flowbite';
 import { useModal } from '@/composables/modal';
 import Modal from '@/components/Modal.vue';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '@/main';
+import { formatDate } from '@/composables/formatDate';
 
 const testsCopy = ref([]);
 const primaryData = reactive({
@@ -89,8 +94,37 @@ const secondaryData = reactive({
 })
 const inputTests = ref({});
 const showComposes = ref(false);
+const showSend = ref(false);
+const loading = ref(false);
 const modal = ref(null);
 const { modalElements, showModal } = useModal();
+const props = defineProps({
+    years: {
+        required: true, type: String
+    },
+    months: {
+        required: true, type: String
+    },
+    scales: {
+        required: true, type: Object
+    },
+    pIndexes: {
+        required: true, type: Array
+    },
+    sIndexes: {
+        required: true, type: Array
+    },
+    patientId: {
+        required: true, type: String
+    },
+    evaluationName: {
+        required: true, type: String
+    },
+    type: {
+        required: true, type: String
+    }
+})
+const emit = defineEmits(['updateData']);
 
 onMounted(() => {
     const target = document.getElementById('popup-modal');
@@ -106,9 +140,38 @@ onBeforeMount(() => {
     testsCopy.value = [ ...tests ];
 })
 
+async function saveEvaluation() {
+    loading.value = true;
+    try {
+        const docRef = await addDoc(collection(db, 'evaluations'), {
+            name: props.evaluationName,
+            patient: props.patientId,
+            type: props.type,
+            data: {
+                primarySum: primaryData.sum,
+                primaryComposes: primaryData.composes,
+                secondarySum: secondaryData.sum,
+                secondaryComposes: secondaryData.composes
+            },
+            date: formatDate(new Date()),
+            years: props.years,
+            months: props.months
+        })
+        console.log(docRef.id);
+        showModal('¡El registro se llevó a cabo con éxito!', false);
+        modal.value.show();
+        emit('updateData');
+    } catch (error) {
+        console.log(error);
+        showModal(`Existió un error en la base de datos: ${error.message}`, false, { variant: 'danger' });
+        modal.value.show();
+    }
+    loading.value = false;
+}
+
 function findScalarScoring() {
-    const primary = findScalars(inputTests.value, a1[0], testsCopy.value, primaryIndexes, 'primary');
-    const secondary = findScalars(inputTests.value, a1[0], testsCopy.value, secondaryIndexes, 'secondary');
+    const primary = findScalars(inputTests.value, props.scales, testsCopy.value, primaryIndexes, 'primary');
+    const secondary = findScalars(inputTests.value, props.scales, testsCopy.value, secondaryIndexes, 'secondary');
 
     if (primary.errors.outOfRange !== '') {
         const testError = testsCopy.value.find(test => test.code === primary.errors.outOfRange).name;
@@ -127,11 +190,13 @@ function findScalarScoring() {
 
     findPrimarySums();
 
-    primaryData.composes = findComposes(a2_a7, true);
-    secondaryData.composes = findComposes(c1_c5);
+    primaryData.composes = findComposes(props.pIndexes, true);
+    secondaryData.composes = findComposes(props.sIndexes);
 
     primaryData.graphics = setGraphics(primaryData.composes, primaryData.range, primaryIndexes);
     secondaryData.graphics = setGraphics(secondaryData.composes, secondaryData.range, secondaryIndexes);
+
+    showSend.value = true;
     showComposes.value = true;
 }
 

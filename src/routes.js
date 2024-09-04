@@ -6,24 +6,10 @@ import WNV from '@/views/WNV.vue'
 import WPPSI from '@/views/WPPSI.vue'
 import WISC from '@/views/WISC.vue'
 import Home from '@/views/Home.vue'
+import Patient from '@/views/Patient.vue'
+import UserProfile from '@/views/UserProfile.vue'
 
 const routes = [
-    {
-        path: '/wais', 
-        component: WAIS
-    },
-    {
-        path: '/wnv', 
-        component: WNV
-    },
-    {
-        path: '/wppsi',
-        component: WPPSI
-    },
-    {
-        path: '/wisc',
-        component: WISC
-    },
     {
         path: '/',
         name: 'Login',
@@ -31,7 +17,34 @@ const routes = [
     },
     {
         path: '/home',
-        component: Home
+        component: Home,
+    },
+    {
+        path: '/user',
+        component: UserProfile,
+    },
+    {
+        path: '/:id',
+        component: Patient,
+        props: true,
+        children: [
+            {
+                path: 'wais', 
+                component: WAIS
+            },
+            {
+                path: 'wnv', 
+                component: WNV
+            },
+            {
+                path: 'wppsi',
+                component: WPPSI
+            },
+            {
+                path: 'wisc',
+                component: WISC
+            }
+        ]
     }
 ]
 

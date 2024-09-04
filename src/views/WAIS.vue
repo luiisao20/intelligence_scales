@@ -5,7 +5,7 @@
             @close-modal="modal.hide()" 
         />
     </div>
-<section class="md:flex md:flex-row gap-10 justify-center main-view">
+<section class="md:flex md:flex-row gap-10 justify-center my-10">
     <div class="w-full">
         <TableTests 
             :tests="testsCopy" 
@@ -16,22 +16,23 @@
         />
     </div>
     <div class="flex flex-col gap-10 w-full items-center">
-        <div class="">
-            <IndexesSum :indexes="indexes" :indexes-sum="indexesSum"/>
-        </div>
-        <div v-if="showComposes" class="flex flex-col items-center gap-5">
+        <IndexesSum :indexes="indexes" :indexes-sum="indexesSum"/>
+        <div v-if="show.composes" class="flex flex-col items-center gap-5">
             <TableIndexes :indexes="indexes" :composes="composes" @update-graphics="changeRange" />
-            <CompositeScores :data-graphics="graphics" :range="range"/>
+            <CompositeScores :data-graphics="graphics" :range="show.range"/>
         </div>
     </div>
 </section>
+<div v-if="show.send" class="text-end">
+    <button type="button" id="save_data" @click="saveEvaluation" :class="{ 'cursor-progress': loading }" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-secondary rounded-lg">
+        Guardar datos
+    </button>
+</div>
 </template>
 
 <script setup>
 import CompositeScores from '../components/CompositeScores.vue';
 import { onBeforeMount, onMounted, reactive } from 'vue';
-import a1 from '../../data/a1_wais.json' with { type: 'json' };
-import a2_a7 from '../../data/a2_a7_wais.json' with { type: 'json' };
 import { tests, indexes } from '@/composables/wais/info';
 import { ref } from 'vue';
 import TableTests from '@/components/TableTests.vue';
@@ -42,28 +43,58 @@ import IndexesSum from '@/components/IndexesSum.vue';
 import { selectReplacementsWAIS } from '@/composables/replacements';
 import { initFlowbite, Modal as ModalFlow } from 'flowbite';
 import { useModal } from '@/composables/modal';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '@/main';
+import { formatDate } from '@/composables/formatDate';
 
 const inputTests = ref({});
 const table = ref({});
 const scalarPoints = ref({});
 const indexesSum = ref({});
 const composes = ref({});
-const showComposes = ref(false);
-const range = ref(false);
+const show = reactive({
+    composes: false,
+    send: false,
+    range: false
+})
+const loading = ref(false);
 const graphics = reactive({
     upperLimits: [],
     values: [],
     lowerLimits: [],
     xlabel: []
 })
-const age = {
-    years: 80,
-    months: 6
-}
 const chrAge = ref(0);
 const testsCopy = ref([]);
 const modal = ref(null);
 const { modalElements, showModal } = useModal();
+const props = defineProps({
+    years: {
+        required: true, type: String
+    },
+    months: {
+        required: true, type: String
+    },
+    scales: {
+        required: true, type: Object
+    },
+    pIndexes: {
+        required: true, type: Array
+    },
+    sIndexes: {
+        default: [], type: Array
+    },
+    patientId: {
+        required: true, type: String
+    },
+    evaluationName: {
+        required: true, type: String
+    },
+    type: {
+        required: true, type: String
+    }
+})
+const emit = defineEmits(['updateData']);
 
 onMounted(() => {
     const target = document.getElementById('popup-modal');
@@ -76,17 +107,44 @@ onMounted(() => {
 })
 
 onBeforeMount(() => {
-    chrAge.value = age.years + age.months / 12;
+    chrAge.value =parseFloat(props.years) +parseFloat(props.months) / 12;
     if (chrAge.value < 70) {
         testsCopy.value = [ ...tests ];
     } else {
         testsCopy.value = tests.filter(test => !test.restriction)
     }
-    table.value = a1[1];
+    table.value = props.scales;
 })
 
+async function saveEvaluation() {
+    loading.value = true;
+    try {
+        const docRef = await addDoc(collection(db, 'evaluations'), {
+            name: props.evaluationName,
+            patient: props.patientId,
+            type: props.type,
+            data: {
+                composes: composes.value,
+                sum: indexesSum.value
+            },
+            date: formatDate(new Date()),
+            years: props.years,
+            months: props.months
+        })
+        console.log(docRef.id);
+        showModal('¡El registro se llevó a cabo con éxito!', false);
+        modal.value.show();
+        emit('updateData');
+    } catch (error) {
+        console.log(error);
+        showModal(`Existió un error en la base de datos: ${error.message}`, false, { variant: 'danger' });
+        modal.value.show();
+    }
+    loading.value = false;
+}
+
 function findScalarScoring() {
-    showComposes.value = false;
+    show.composes = false;
     const { points, sum, errors } = findScalars(inputTests.value, table.value, testsCopy.value, indexes);
     
     scalarPoints.value = points;
@@ -95,12 +153,14 @@ function findScalarScoring() {
         const testError = testsCopy.value.find(test => test.code === errors.outOfRange).name;
         showModal(`La prueba ${testError} se encuentra fuera de rango`, false);
         modal.value.show();
+        return
     }
 
     try {
         getSum();
         findComposes();
-        showComposes.value = true;
+        show.composes = true;
+        show.send = true;
     } catch (error) {
         showModal(error, false);
         modal.value.show();
@@ -158,7 +218,7 @@ function getSum() {
 function changeRange(value) {
     graphics.lowerLimits = [];
     graphics.upperLimits = [];
-    range.value = value;
+    show.range = value;
     
     indexes.forEach((key) => {
         const compose = composes.value[key.code];
@@ -167,7 +227,7 @@ function changeRange(value) {
 }
 
 function setLimits(compose) {
-    if (!range.value) {
+    if (!show.range) {
         graphics.upperLimits.push(compose['90%'].split('-')[1]);
         graphics.lowerLimits.push(compose['90%'].split('-')[0]);
     } else {
@@ -181,7 +241,7 @@ function findComposes() {
     graphics.values = [];
     graphics.upperLimits = [];
 
-    a2_a7.forEach(element => {
+    props.pIndexes.forEach(element => {
         const sum = indexesSum.value[element.index];
 
         if (sum) composes.value[element.index] = element.data[sum];
@@ -197,7 +257,7 @@ function findComposes() {
         }
     })
 
-    showComposes.value = true;
+    show.composes = true;
 }
 
 </script>

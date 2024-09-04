@@ -5,7 +5,7 @@
             @close-modal="modal.hide()" 
         />
     </div>
-    <section class="main-view">
+    <section class="my-10">
         <div>
             <TableInputs
                 :tests="testsCopy"
@@ -55,15 +55,17 @@
                 graphics-id="two" />
 
         </div>
+        <div v-if="showSend" class="text-end">
+            <button type="button" id="save_data" @click="saveEvaluation" :class="{ 'cursor-progress': loading }" class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-secondary rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+                Guardar datos
+            </button>
+        </div>
     </section>
 </template>
 
 <script setup>
 import { tests, primaryIndexes, secondaryIndexes } from '@/composables/wppsi/info';
 import { selectReplacementsWPPSI } from '@/composables/replacements';
-import a1 from '../../data/a1_wppsi.json' with { type: 'json' };
-import a2_a11 from '../../data/a2_a11_wppsi.json' with { type: 'json' };
-import b_c from '../../data/b_c_wppsi.json' with { type: 'json' };
 import TableInputs from '@/components/TableInputs.vue';
 import { onBeforeMount, onMounted, reactive, ref } from 'vue';
 import { findScalars } from '@/composables/getRange';
@@ -73,6 +75,9 @@ import CompositeScores from '@/components/CompositeScores.vue';
 import { useModal } from '@/composables/modal';
 import { initFlowbite, Modal as ModalFlow } from 'flowbite';
 import Modal from '@/components/Modal.vue';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '@/main';
+import { formatDate } from '@/composables/formatDate';
 
 const primaryData = reactive({
     points: {},
@@ -94,15 +99,40 @@ const restrictions = reactive ({
     age: ''
 })
 const inputTests = ref({});
-const age = {
-    years: 5,
-    months: 6
-}
 const chrAge = ref(0);
 const showComposes = ref(false);
+const showSend = ref(false);
+const loading = ref(false);
 const testsCopy = ref([]);
 const modal = ref(null);
 const { modalElements, showModal } = useModal();
+const props = defineProps({
+    years: {
+        required: true, type: String
+    },
+    months: {
+        required: true, type: String
+    },
+    scales: {
+        required: true, type: Object
+    },
+    pIndexes: {
+        required: true, type: Array
+    },
+    sIndexes: {
+        required: true, type: Array
+    },
+    patientId: {
+        required: true, type: String
+    },
+    evaluationName: {
+        required: true, type: String
+    },
+    type: {
+        required: true, type: String
+    }
+})
+const emit = defineEmits(['updateData']);
 
 onMounted(() => {
     const target = document.getElementById('popup-modal');
@@ -115,9 +145,12 @@ onMounted(() => {
 })
 
 onBeforeMount(() => {
-    chrAge.value = age.years + age.months / 12;
+    chrAge.value = parseFloat(props.years) + parseFloat(props.months) / 12;
     testsCopy.value = [ ...tests ];
-
+    if(!props.scales) {
+        console.log('here');
+        
+    }
     if (chrAge.value >= 4) {
         const dIndex = testsCopy.value.findIndex(test => test.code === 'D');
         testsCopy.value[dIndex].primary = [];
@@ -137,6 +170,36 @@ onBeforeMount(() => {
     }
     
 })
+
+async function saveEvaluation() {
+    loading.value = true;
+    try {
+        const docRef = await addDoc(collection(db, 'evaluations'), {
+            name: props.evaluationName,
+            patient: props.patientId,
+            type: props.type,
+            data: {
+                primarySum: primaryData.sum,
+                primaryComposes: primaryData.composes,
+                secondarySum: secondaryData.sum,
+                secondaryComposes: secondaryData.composes
+            },
+            date: formatDate(new Date()),
+            years: props.years,
+            months: props.months
+        })
+        console.log(docRef.id);
+        showModal('¡El registro se llevó a cabo con éxito!', false);
+        modal.value.show();
+        emit('updateData');
+    } catch (error) {
+        console.log(error);
+        showModal(`Existió un error en la base de datos: ${error.message}`, false, { variant: 'danger' });
+        modal.value.show();
+    }
+    loading.value = false;
+}
+
 // Busca errores de los indices primarios en edades menores a 4 años
 function findPrimaryErrors() {
     const testsToEval = testsCopy.value.filter(test => !test.restriction);
@@ -321,8 +384,8 @@ function findSecErrors() {
 
 function findScalarScoring() {
     showComposes.value = false;
-    const primary = findScalars(inputTests.value, a1[8], testsCopy.value, primaryIndexes, 'primary');
-    const secondary = findScalars(inputTests.value, a1[8], testsCopy.value, secondaryIndexes, 'secondary');
+    const primary = findScalars(inputTests.value, props.scales, testsCopy.value, primaryIndexes, 'primary');
+    const secondary = findScalars(inputTests.value, props.scales, testsCopy.value, secondaryIndexes, 'secondary');
 
     primaryData.points = primary.points;
     primaryData.sum = primary.sum;
@@ -347,11 +410,14 @@ function findScalarScoring() {
         findSecondaryErrors();
     }
 
-    primaryData.composes = findComposes(a2_a11, true);
-    secondaryData.composes = findComposes(b_c);
+    primaryData.composes = findComposes(props.pIndexes, true);
+    secondaryData.composes = findComposes(props.sIndexes);
 
     primaryData.graphics = setGraphics(primaryData.composes, primaryData.range, primaryIndexes);
     secondaryData.graphics = setGraphics(secondaryData.composes, secondaryData.range, secondaryIndexes);
+
+    showSend.value = true;
+
     showComposes.value = true;
 }
 
@@ -394,7 +460,7 @@ function changeRange(value, state) {
 }
 
 function findComposes(array, primary) {
-    chrAge.value = age.years + age.months / 12;
+    chrAge.value = parseFloat(props.years) + parseFloat(props.months) / 12;
     let composes = {};
 
     array.forEach(element => {

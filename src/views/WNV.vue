@@ -5,7 +5,7 @@
             @close-modal="modal.hide()" 
         />
     </div>
-<section class="main-view">
+<section class="my-10">
     <TableTests
         :tests="testsCopy"
         :indexes="index"
@@ -14,7 +14,7 @@
         :wnv="true"
         @show-points="findScalarScoring"
     />
-    <div v-if="showComposes" class="flex flex-col items-center gap-10 my-10">
+    <div v-if="show.composes" class="flex flex-col items-center gap-10 my-10">
         <TableIndexes 
             :indexes="index"
             :composes="composePoints" 
@@ -23,62 +23,114 @@
         />
         <div class="flex justify-center gap-20">
             <CompositeScores 
-                :data-graphics="graphics" :range="range"
+                :data-graphics="graphics" :range="show.range"
                 title="Puntuación Escala Total"
             />
         </div>
+    </div>
+    <div v-if="show.send" class="text-end">
+        <button type="button" id="save_data" @click="saveEvaluation" :class="{ 'cursor-progress': loading }" class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-secondary rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
+            Guardar datos
+        </button>
     </div>
 </section>
 </template>
 
 <script setup>
-import a1 from '../../data/a1_wnv.json' with { type: 'json' };
-import a2 from '../../data/a2_wnv.json' with { type: 'json' };
 import { tests } from '@/composables/wnv/info';
 import TableTests from '@/components/TableTests.vue';
 import { onBeforeMount, onMounted, reactive, ref } from 'vue';
 import { findScalars } from '@/composables/getRange';
 import TableIndexes from '@/components/TableIndexes.vue';
 import CompositeScores from '@/components/CompositeScores.vue';
-import TestsScores from '@/components/TestsScores.vue';
 import Modal from '@/components/Modal.vue';
 import { useModal } from '@/composables/modal';
 import { initFlowbite, Modal as ModalFlow } from 'flowbite';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '@/main';
+import { formatDate } from '@/composables/formatDate';
 
 const index = [
     {
         code: 'CIT',
-        name: 'Coeficiente intelectual total',
+        name: 'Escala total',
         group: null
     }
 ]
+const props = defineProps({
+    years: {
+        required: true, type: String
+    },
+    months: {
+        required: true, type: String
+    },
+    scales: {
+        required: true, type: Object
+    },
+    pIndexes: {
+        required: true, type: Array
+    },
+    sIndexes: {
+        default: [], type: Array
+    },
+    patientId: {
+        required: true, type: String
+    },
+    evaluationName: {
+        required: true, type: String
+    },
+    type: {
+        required: true, type: String
+    }
+})
 const inputTests = ref({});
 const scalarPoints = ref({});
 const restrictions = {
     '5-0 7-11': ['MAT', 'CLA', 'ROM', 'REC'],
     '8-0 21-11': ['MAT', 'CLA', 'MES', 'HIS']
 }
-const composePoints = ref({})
-const showComposes = ref(false);
-const range = ref(false);
+const composePoints = ref({});
+const show = reactive({
+    composes: false,
+    send: false,
+    range: false
+})
+const loading = ref(false);
 const graphics = reactive({
     upperLimits: [],
     values: [],
     lowerLimits: [],
     xlabel: [],
 })
-const graphicsTest = reactive({
-    values: [],
-    xlabel: [],
-})
-const age = {
-    years: 7,
-    months: 6
-}
 const chrAge = ref(0);
 const testsCopy = ref([]);
 const modal = ref(null);
 const { modalElements, showModal } = useModal();
+const emit = defineEmits(['updateData']);
+
+async function saveEvaluation() {
+    loading.value = true;
+    try {
+        const docRef = await addDoc(collection(db, 'evaluations'), {
+            name: props.evaluationName,
+            patient: props.patientId,
+            type: 'wnv',
+            data: composePoints.value,
+            date: formatDate(new Date()),
+            years: props.years,
+            months: props.months
+        })
+        console.log(docRef.id);
+        showModal('¡El registro se llevó a cabo con éxito!', false);
+        modal.value.show();
+        emit('updateData');
+    } catch (error) {
+        console.log(error);
+        showModal(`Existió un error en la base de datos: ${error.message}`, false, { variant: 'danger' });
+        modal.value.show();
+    }
+    loading.value = false;
+}
 
 onMounted(() => {
     const target = document.getElementById('popup-modal');
@@ -91,7 +143,7 @@ onMounted(() => {
 })
 
 onBeforeMount(() => {
-    chrAge.value = age.years + age.months / 12;
+    chrAge.value = parseFloat(props.years) + parseFloat(props.months) / 12;
 
     if (chrAge.value < 8) {
         testsCopy.value = tests.filter(test => restrictions['5-0 7-11'].includes(test.code));
@@ -104,14 +156,14 @@ onBeforeMount(() => {
 function changeRange(value) {
     graphics.lowerLimits = [];
     graphics.upperLimits = [];
-    range.value = value;
+    show.range = value;
     
     const compose = composePoints.value['CIT'];
     setLimits(compose);
 }
 
 function setLimits(compose) {
-    if (!range.value) {
+    if (!show.range) {
         graphics.upperLimits.push(compose['90%'].split('-')[1]);
         graphics.lowerLimits.push(compose['90%'].split('-')[0]);
     } else {
@@ -121,9 +173,13 @@ function setLimits(compose) {
 }
 
 function findScalarScoring() {
-    showComposes.value = false;
+    show.composes = false;
 
-    const { points, sum, errors } = findScalars(inputTests.value, a1[0], testsCopy.value, index);
+    graphics.lowerLimits = [];
+    graphics.upperLimits = [];
+    graphics.values = [];
+
+    const { points, sum, errors } = findScalars(inputTests.value, props.scales, testsCopy.value, index);
     scalarPoints.value = points;
 
     if (errors.outOfRange !== '') {
@@ -134,18 +190,15 @@ function findScalarScoring() {
         showModal('Hay una prueba vacía', false);
         modal.value.show();
     } else {
-        composePoints.value[index[0].code] = a2[0].data[sum.CIT.toString()];
+        composePoints.value[index[0].code] = props.pIndexes[0].data[sum.CIT.toString()];
         composePoints.value['Sum'] = sum[index[0].code];
     
         graphics.values.push(composePoints.value['CIT']['CIT']);
         graphics.xlabel.push(index[0].code);
         setLimits(composePoints.value['CIT']);
-    
-        testsCopy.value.forEach((test) => {
-            graphicsTest.values.push(scalarPoints.value[test.code]);
-            graphicsTest.xlabel.push(test.code);
-        })
-        showComposes.value = true;
+
+        show.composes = true;
+        show.send = true;
     }
 
 }

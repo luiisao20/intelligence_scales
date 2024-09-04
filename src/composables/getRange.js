@@ -7,6 +7,9 @@ function generateIntegerArray(lowerLimit, upperLimit) {
 function getRange(test, value) {
     if (value === '') return -1;
 
+    console.log(test);
+    
+
     for (let i = 0; i < Object.keys(tableVals.data[test]).length; i++) {
         const range = Object.keys(tableVals.data[test])[i];
         let arrayG = [];
